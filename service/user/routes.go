@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/alissoncorsair/goapi/config"
 	"github.com/alissoncorsair/goapi/service/auth"
 	"github.com/alissoncorsair/goapi/types"
 	"github.com/alissoncorsair/goapi/utils"
@@ -27,7 +28,36 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) HandleLogin(w http.ResponseWriter, r *http.Request) {
+	var payload types.LoginUserPayload
+	if err := utils.ParseJSON(r, &payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, err)
+		return
+	}
 
+	u, err := h.store.GetUserByEmail(payload.Email)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("user with email %s not found", payload.Email))
+		return
+	}
+
+	if !auth.ComparePassword(u.Password, []byte(payload.Password)) {
+		utils.WriteError(w, http.StatusUnauthorized, fmt.Errorf("user with email %s not found", payload.Email))
+		return
+	}
+
+	secret := []byte(config.Envs.JWTSecret)
+
+	token, err := auth.CreateJWT(secret, u.ID)
+
+	if err != nil {
+		utils.WriteError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, map[string]string{
+		"token": token,
+	})
 }
 
 func (h *Handler) HandleRegister(w http.ResponseWriter, r *http.Request) {
