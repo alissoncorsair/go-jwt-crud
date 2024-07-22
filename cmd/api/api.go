@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/alissoncorsair/goapi/service/product"
 	"github.com/alissoncorsair/goapi/service/user"
 	"github.com/gorilla/mux"
 )
@@ -31,6 +32,9 @@ func (server *APIServer) Run() error {
 	userStore := user.NewStore(server.db)
 	userHandler := user.NewHandler(userStore)
 	userHandler.RegisterRoutes(subrouter)
+	productStore := product.NewStore(server.db)
+	productHandler := product.NewHandler(productStore)
+	productHandler.RegisterRoutes(subrouter)
 
 	return http.ListenAndServe(server.addr, subrouter)
 }
