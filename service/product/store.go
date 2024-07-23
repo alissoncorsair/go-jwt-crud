@@ -92,7 +92,8 @@ func (s *Store) CreateProduct(product types.CreateProductPayload) error {
 }
 
 func (s *Store) UpdateProduct(product types.Product) error {
-	_, err := s.db.Exec("UPDATE products SET name = ?, price = ?, image = ?, description = ?, quantity = ? WHERE id = ?", product.Name, product.Price, product.Image, product.Description, product.Quantity, product.ID)
+	_, err := s.db.Exec("UPDATE products SET name = $1, price = $2, image = $3, description = $4, quantity = $5 WHERE id = $6", product.Name, product.Price, product.Image, product.Description, product.Quantity, product.ID)
+
 	if err != nil {
 		return err
 	}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/alissoncorsair/goapi/types"
+	_ "github.com/lib/pq"
 )
 
 type Store struct {

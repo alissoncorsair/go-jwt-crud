@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/alissoncorsair/goapi/types"
+	_ "github.com/lib/pq"
 )
 
 func getCartItemsIDS(item []types.CartItem) ([]int, error) {
@@ -37,7 +38,11 @@ func (h *Handler) createOrder(products []*types.Product, items []types.CartItem,
 	for _, item := range items {
 		prod := productMap[item.ProductID]
 		prod.Quantity -= item.Quantity
-		h.productStore.UpdateProduct(prod)
+		err := h.productStore.UpdateProduct(prod)
+
+		if err != nil {
+			return 0, 0, err
+		}
 	}
 
 	// create the order

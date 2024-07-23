@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/alissoncorsair/goapi/service/cart"
+	"github.com/alissoncorsair/goapi/service/order"
 	"github.com/alissoncorsair/goapi/service/product"
 	"github.com/alissoncorsair/goapi/service/user"
 	"github.com/gorilla/mux"
@@ -30,11 +32,14 @@ func (server *APIServer) Run() error {
 
 	//store would be like a repository
 	userStore := user.NewStore(server.db)
-	userHandler := user.NewHandler(userStore)
-	userHandler.RegisterRoutes(subrouter)
+	orderStore := order.NewStore(server.db)
 	productStore := product.NewStore(server.db)
+	userHandler := user.NewHandler(userStore)
 	productHandler := product.NewHandler(productStore)
+	cartHandler := cart.NewHandler(orderStore, productStore, userStore)
+	userHandler.RegisterRoutes(subrouter)
 	productHandler.RegisterRoutes(subrouter)
+	cartHandler.RegisterRoutes(subrouter)
 
 	return http.ListenAndServe(server.addr, subrouter)
 }

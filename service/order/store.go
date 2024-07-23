@@ -4,6 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/alissoncorsair/goapi/types"
+	_ "github.com/lib/pq"
 )
 
 type Store struct {
@@ -15,13 +16,9 @@ func NewStore(db *sql.DB) *Store {
 }
 
 func (s *Store) CreateOrder(order types.Order) (int, error) {
-	res, err := s.db.Exec("INSERT into orders (user_id, total, status, address) VALUES ($1, $2, $3, $4)", order.UserID, order.Total, order.Status, order.Address)
+	var id int
+	err := s.db.QueryRow("INSERT into orders (user_id, total, status, address) VALUES ($1, $2, $3, $4) RETURNING id", order.UserID, order.Total, order.Status, order.Address).Scan(&id)
 
-	if err != nil {
-		return 0, err
-	}
-
-	id, err := res.LastInsertId()
 	if err != nil {
 		return 0, err
 	}

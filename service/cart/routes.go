@@ -30,7 +30,7 @@ func (h *Handler) RegisterRoutes(router *mux.Router) {
 }
 
 func (h *Handler) handleCheckout(w http.ResponseWriter, r *http.Request) {
-	userId := 0
+	userId := auth.GetUserIDFromContext(r.Context())
 	var cart types.CartCheckoutPayload
 
 	if err := utils.ParseJSON(r, &cart); err != nil {
