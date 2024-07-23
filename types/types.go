@@ -58,6 +58,15 @@ type OrderStore interface {
 	CreateOrderItem(OrderItem) error
 }
 
+type CartItem struct {
+	ProductID int `json:"product_id"`
+	Quantity  int `json:"quantity"`
+}
+
+type CartCheckoutPayload struct {
+	Items []CartItem `json:"items" validate:"required"`
+}
+
 type CreateProductPayload struct {
 	Name        string  `json:"name" validate:"required"`
 	Description string  `json:"description" validate:"required"`
@@ -76,4 +85,9 @@ type RegisterUserPayload struct {
 type LoginUserPayload struct {
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required"`
+}
+
+type CheckoutResponse struct {
+	OrderID    int     `json:"order_id"`
+	TotalPrice float64 `json:"total_price"`
 }
